@@ -17,7 +17,7 @@ Ao converter as chaves em índices, as informações são colocadas na tabela ha
 
 ## Metodo de Multiplicação
 
-A chave é umtiplicada por uma constante fracinaria(A), extraimos a perte fracionária da multiplicação e multiplicamos pelo tamanho da tabela e o resultado da multiplicação é armazenado em uma palavra de b bits.
+A chave é umtiplicada por uma constante fracinária(A), extraimos a perte fracionária da multiplicação e multiplicamos pelo tamanho da tabela e o resultado da multiplicação é armazenado em uma palavra de b bits.
 
 ## Sondagem Linear
 

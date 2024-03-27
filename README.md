@@ -1,4 +1,4 @@
-# Tabela Hash d=método de Multiplicação e Sondagem Linear 
+# Tabela Hash método de Multiplicação e Sondagem Linear 
 
 ## Doscente:
    [Kennedy Reurison Lopes](https://github.com/kennedyufersa)

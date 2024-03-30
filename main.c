@@ -88,6 +88,27 @@ Calcula o índice usando a função hash.
 Procura na posição calculada e nas próximas posições (sondagem linear) até encontrar o contato ou uma posição livre.
 Se encontrar o contato, retorna o contato encontrado, caso contrário, retorna que o contato não foi encontrado.*/
 
+int removerContato(EntradaTabelaHash tabela[], int chave) {
+    int posicao = hash(chave);
+    int inicial = posicao;
+
+    do {
+        if (tabela[posicao].ocupado && !tabela[posicao].removido && tabela[posicao].chave == chave) {
+            tabela[posicao].removido = 1;
+            printf("Contato removido da posição %d\n", posicao);
+            return 1; // Removeu o contato com sucesso
+        } else if (!tabela[posicao].ocupado) {
+            printf("Contato não encontrado para remoção\n");
+            return 0; // Posição da chave vazia indicando que o contato não foi encontrado
+        } else {
+            posicao = (posicao + 1) % TABLE_SIZE; // Incrementa a posição e aplica uma operação de módulo para lidar com sondagem linear
+        }
+    } while (posicao != inicial); // Continua o loop até que a posição volte à posição inicial, indicando que a busca foi concluída
+
+    printf("Contato não encontrado para remoção\n");
+}
+/*Função que remove um contato da tabela hash.*/
+
 int main() {
 
   FILE *f = fopen("todosOsContatos.txt", "r");
@@ -112,4 +133,12 @@ int main() {
     printf("%s\n", email);
 
   }
+    fclose(f);
+
+    free(nome);
+    free(tel);
+    free(email);
+
+    return 0;
+    /*Libere a memória alocada*/
 }

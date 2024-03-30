@@ -1,6 +1,6 @@
 # Tabela Hash método de Multiplicação e Sondagem Linear 
 
-## Doscente:
+## Docente:
    [Kennedy Reurison Lopes](https://github.com/kennedyufersa)
 
 ## Discentes:
@@ -12,16 +12,47 @@
 ## Introdução
 
 Programa escrito em linguagem C que armazena uma lista telefônica  extraida de [todosOsContatos](https://github.com/AlexKauan/lista-de-contatos/blob/main/todosOsContatos.txt) em uma tabela Hash/disperção. Este programa utiliza o metodo de multiplicação para implementar a tabela de disperção e para tratar as colições é utilazado a sondagem linear.
-### Metodo de Multiplicação
 
-A chave é umtiplicada por uma constante fracinária(A), extraimos a perte fracionária da multiplicação e multiplicamos pelo tamanho da tabela e o resultado da multiplicação é armazenado em uma palavra de b bits.
+## Principais Operações
 
-### Sondagem Linear
+- Inserção
+- Busca
+- Remoção
 
-Quando ocorre uma colisão em uma tabela hash,ou seja duas chaves diferentes resultaram no mesmo índice após a aplicação da função de dispersão. Para lidar com essa situação, empregamos o método de sondagem linear, que consiste em buscar o próximo índice disponível na tabela hash quando um índice já está ocupado.
+## Implemnetação
+### Interface Gráfica
+A interface gráfica escolhida para estre projeto foi por meio de arquivos, o resultado da hash pode ser visto pelo arquivo  ou pelo gdb.
+### Configuração da Tablea Hash
+- *Método da Multiplicação*: Multiplicamoa a chave por uma constante e depois extraimos a parte fracinária.
+```
+  int hash(int chave) {
+    // Método de multiplicação
+    return (int)((chave * 0.6180339887) * TABLE_SIZE) % TABLE_SIZE;
+}
+ ```
 
-O processo de sondagem linear pode ser descrito da seguinte maneira:
+- *Sondagem Linear*: Quando ocorre uma colisão, uma nova posição é buscada incrementando até encontrar uma posição que esteja vazia.
+```
+void inserir(EntradaTabelaHash tabela[], int chave, Contato contato) {
+    int posicao = hash(chave);
+    int inicial = posicao;
+    int inserido = 0;
 
-Após uma colisão ocorrer para uma chave k no índice ℎ(k) da tabela hash, verificamos o próximo índice, h(k)+1, na tabela hash. Se esse próximo índice estiver vazio, inserimos a chave nesse índice.
-Se o próximo índice estiver ocupado, continuamos verificando os próximos índices na sequência h(k)+2,h(k)+3, ...) até encontrarmos um índice vazio.
-Repetimos esse processo até localizar um índice vazio na tabela hash.
+    do {
+        if (!tabela[posicao].ocupado || tabela[posicao].removido) {
+            tabela[posicao].chave = chave;
+            tabela[posicao].contato = contato;
+            tabela[posicao].ocupado = 1;
+            tabela[posicao].removido = 0;
+            inserido = 1;
+            printf("Contato inserido com sucesso na posição %d\n", posicao);
+        } else {
+            posicao = (posicao + 1) % TABLE_SIZE;
+        }
+    } while (!inserido && posicao != inicial);
+
+    if (!inserido) {
+        printf("Não foi possível inserir o contato. Tabela cheia.\n");
+    }
+}
+```

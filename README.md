@@ -4,7 +4,7 @@
    [Kennedy Reurison Lopes](https://github.com/kennedyufersa)
 
 ## Discentes:
-- [Alex Kauan](https://github.com/AlexKauan)
+- [Alex Kauan de Oliveira Lima](https://github.com/AlexKauan)
 - [Andrews Ferreira de Paiva Silva](https://github.com/TheFonci)
 - [Ângela Maria de Aquino Souza](https://github.com/angellusj)
 - [Michely Vitória Costa Felix](https://github.com/MichelyFelix)

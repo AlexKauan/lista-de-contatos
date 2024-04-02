@@ -8,7 +8,7 @@ typedef struct
 {
     char nome[50];
     char telefone[15];
-    char email[50]; // Novo campo de e-mail
+    char email[50];
 } Contato;
 
 typedef struct

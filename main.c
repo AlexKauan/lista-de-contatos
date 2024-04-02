@@ -3,142 +3,213 @@
 #include <string.h>
 
 #define TABLE_SIZE 50
-#define LOAD_FACTOR_MIN 25
-#define LOAD_FACTOR_MAX 75
-//Variáveis globais para definir o tamanho da tabela com a capacidade total de 25 a 75 (Sem Colisão) de todos os contatos.
 
-typedef struct {
+typedef struct
+{
     char nome[50];
     char telefone[15];
-    char email[50]
+    char email[50]; // Novo campo de e-mail
 } Contato;
-//Estrutura dos contatos para armazenar os contatos que serão lidos do arquivo.
 
-typedef struct {
+typedef struct
+{
     int chave;
     Contato contato;
     int ocupado;
     int removido;
-} EntradaTabelaHash;
-// Estrutura que representa uma entrada na tabela hash, contendo a chave, o contato, e indicadores de se a posição está ocupada (ocupado) ou se o contato foi removido (removido).
+} EntradaTabela;
 
-void inicializarTabela(EntradaTabelaHash tabela[]) {
-    for (int i = 0; i < TABLE_SIZE; i++) {
+void inicializarTabela(EntradaTabela tabela[])
+{
+    for (int i = 0; i < TABLE_SIZE; i++)
+    {
         tabela[i].ocupado = 0;
         tabela[i].removido = 0;
     }
 }
-//Função que inicializa todas as entradas da tabela como não ocupadas e não removidas.
 
-int hash(int chave) {
-    // Método de multiplicação
-    return (int)((chave * 0.6180339887) * TABLE_SIZE) % TABLE_SIZE;
+int hash(int chave)
+{
+    return (int)(chave * 0.6180339887) * TABLE_SIZE % TABLE_SIZE;
 }
-//Função que calcula o índice da tabela hash para uma determinada chave usando o método de multiplicação.
 
-void inserir(EntradaTabelaHash tabela[], int chave, Contato contato) {
+void inserir(EntradaTabela tabela[], int chave, Contato contato)
+{
     int posicao = hash(chave);
     int inicial = posicao;
     int inserido = 0;
 
-    do {
-        if (!tabela[posicao].ocupado || tabela[posicao].removido) {
+    do
+    {
+        if (!tabela[posicao].ocupado || tabela[posicao].removido)
+        {
             tabela[posicao].chave = chave;
             tabela[posicao].contato = contato;
             tabela[posicao].ocupado = 1;
             tabela[posicao].removido = 0;
             inserido = 1;
             printf("Contato inserido com sucesso na posição %d\n", posicao);
-        } else {
+        }
+        else
+        {
             posicao = (posicao + 1) % TABLE_SIZE;
         }
     } while (!inserido && posicao != inicial);
 
-    if (!inserido) {
+    if (!inserido)
+    {
         printf("Não foi possível inserir o contato. Tabela cheia.\n");
     }
 }
-/* Função que insere um contato na tabela hash.
-Calcula o índice usando a função hash.
-Tenta inserir na posição calculada, se a posição estiver ocupada, tenta a próxima posição (sondagem linear) até encontrar uma posição livre.
-Se não encontrar uma posição livre, a inserção falha.*/
 
-int buscar(EntradaTabelaHash tabela[], int chave, Contato *contato) {
+int buscar(EntradaTabela tabela[], int chave, Contato *contato)
+{
     int posicao = hash(chave);
     int inicial = posicao;
 
-    do {
-        if (tabela[posicao].ocupado && !tabela[posicao].removido && tabela[posicao].chave == chave) {
+    do
+    {
+        if (tabela[posicao].ocupado && !tabela[posicao].removido && tabela[posicao].chave == chave)
+        {
             *contato = tabela[posicao].contato;
             printf("Contato encontrado na posição %d\n", posicao);
-            return 1; // Encontrou o contato
-        } else if (!tabela[posicao].ocupado) {
+            return 1;
+        }
+        else if (!tabela[posicao].ocupado)
+        {
             printf("Contato não encontrado\n");
-            return 0; // Contato não encontrado
-        } else {
+            return 0;
+        }
+        else
+        {
             posicao = (posicao + 1) % TABLE_SIZE;
         }
     } while (posicao != inicial);
 
     printf("Contato não encontrado\n");
-    return 0; // Contato não encontrado
+    return 0;
 }
-/*Função que busca um contato na tabela hash.
-Calcula o índice usando a função hash.
-Procura na posição calculada e nas próximas posições (sondagem linear) até encontrar o contato ou uma posição livre.
-Se encontrar o contato, retorna o contato encontrado, caso contrário, retorna que o contato não foi encontrado.*/
 
-int removerContato(EntradaTabelaHash tabela[], int chave) {
+int remover(EntradaTabela tabela[], int chave)
+{
     int posicao = hash(chave);
     int inicial = posicao;
 
-    do {
-        if (tabela[posicao].ocupado && !tabela[posicao].removido && tabela[posicao].chave == chave) {
+    do
+    {
+        if (tabela[posicao].ocupado && !tabela[posicao].removido && tabela[posicao].chave == chave)
+        {
             tabela[posicao].removido = 1;
-            printf("Contato removido da posição %d\n", posicao);
-            return 1; // Removeu o contato com sucesso
-        } else if (!tabela[posicao].ocupado) {
-            printf("Contato não encontrado para remoção\n");
-            return 0; // Posição da chave vazia indicando que o contato não foi encontrado
-        } else {
-            posicao = (posicao + 1) % TABLE_SIZE; // Incrementa a posição e aplica uma operação de módulo para lidar com sondagem linear
+            printf("Contato removido com sucesso da posição %d\n", posicao);
+            return 1;
         }
-    } while (posicao != inicial); // Continua o loop até que a posição volte à posição inicial, indicando que a busca foi concluída
+        else if (!tabela[posicao].ocupado)
+        {
+            printf("Contato não encontrado\n");
+            return 0;
+        }
+        else
+        {
+            posicao = (posicao + 1) % TABLE_SIZE;
+        }
+    } while (posicao != inicial);
 
-    printf("Contato não encontrado para remoção\n");
+    printf("Contato não encontrado\n");
+    return 0;
 }
-/*Função que remove um contato da tabela hash.*/
 
-int main() {
+int main()
+{
+    EntradaTabela tabela[TABLE_SIZE];
+    inicializarTabela(tabela);
 
-  FILE *f = fopen("todosOsContatos.txt", "r");
-  char *nome;
-  char *tel;
-  char *email;
+    FILE *arquivo = fopen("todosOsContatos.txt", "r");
+    if (arquivo == NULL)
+    {
+        printf("Erro ao abrir o arquivo de contatos\n");
+        return 1;
+    }
 
-  nome = (char *)malloc(20 * sizeof(char));
-  tel = (char *)malloc(20 * sizeof(char));
-  email = (char *)malloc(20 * sizeof(char));
+    char linha[100];
+    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    {
+        int chave;
+        char nome[50], telefone[15], email[50];
+        sscanf(linha, "%d %s %s %s", &chave, nome, telefone, email);
+        Contato contato;
+        strcpy(contato.nome, nome);
+        strcpy(contato.telefone, telefone);
+        strcpy(contato.email, email);
+        inserir(tabela, chave, contato);
+    }
 
-  for (int i = 0; i < 10000; i++) {
+    fclose(arquivo);
 
-    fscanf(f, "Nome: %[A-Z. a-z]\n", nome);
-    fscanf(f, "Telefone: %[(0-9) -0-9]\n", tel);
-    fscanf(f, "Email: %s\n", email);
-    fscanf(f, "\n");
+    int opcao;
+    while (1)
+    {
+        printf("\nMenu:\n");
+        printf("1. Inserir Contato\n");
+        printf("2. Buscar Contato\n");
+        printf("3. Remover Contato\n");
+        printf("4. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
 
-    printf("%d\n", i);
-    printf("%s\n", nome);
-    printf("%s\n", tel);
-    printf("%s\n", email);
-
-  }
-    fclose(f);
-
-    free(nome);
-    free(tel);
-    free(email);
+        switch (opcao)
+        {
+        case 1:
+        {
+            int chave;
+            char nome[50], telefone[15], email[50];
+            printf("Digite a chave do contato: ");
+            scanf("%d", &chave);
+            printf("Digite o nome do contato: ");
+            scanf("%s", nome);
+            printf("Digite o telefone do contato: ");
+            scanf("%s", telefone);
+            printf("Digite o email do contato: ");
+            scanf("%s", email);
+            Contato novo_contato;
+            strcpy(novo_contato.nome, nome);
+            strcpy(novo_contato.telefone, telefone);
+            strcpy(novo_contato.email, email);
+            inserir(tabela, chave, novo_contato);
+            break;
+        }
+        case 2:
+        {
+            int chave_busca;
+            printf("Digite a chave do contato a ser buscado: ");
+            scanf("%d", &chave_busca);
+            Contato contato_busca;
+            if (buscar(tabela, chave_busca, &contato_busca))
+            {
+                printf("Contato encontrado: %s - %s - %s\n", contato_busca.nome, contato_busca.telefone, contato_busca.email);
+            }
+            break;
+        }
+        case 3:
+        {
+            int chave_remover;
+            printf("Digite a chave do contato a ser removido: ");
+            scanf("%d", &chave_remover);
+            if (remover(tabela, chave_remover))
+            {
+                printf("Contato removido com sucesso\n");
+            }
+            break;
+        }
+        case 4:
+        {
+            printf("Saindo do programa\n");
+            return 0;
+        }
+        default:
+            printf("Opção inválida\n");
+            break;
+        }
+    }
 
     return 0;
-    /*Libere a memória alocada*/
 }

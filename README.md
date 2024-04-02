@@ -22,7 +22,7 @@ Programa escrito em linguagem C que armazena uma lista telefônica  extraida de 
 ### Interface Gráfica
 A interface gráfica escolhida para estre projeto foi por meio de arquivos, o resultado da hash pode ser visto pelo arquivo  ou pelo gdb.
 ### Configuração da Tablea Hash
-A tabela hash foi implementada utilizando uma estrutura de dados de dispersão que mapeia chaves para valores. O tamanho da tabela (TABLE_SIZE) foi definido como 50, para manter um equilíbrio entre eficiência de espaço e tempo de acesso, considerando-se o número de contatos esperados. Essas escolhas visam otimizar o desempenho da tabela hash, garantindo um bom tempo de acesso e minimizando colisões, enquanto mantêm a implementação simples e eficiente.
+A tabela hash foi implementada utilizando uma estrutura de dados de dispersão que mapeia chaves para valores. O tamanho da tabela (TABLE_SIZE) foi definido como 10000, para manter um equilíbrio entre eficiência de espaço e tempo de acesso, considerando-se o número de contatos esperados. Essas escolhas visam otimizar o desempenho da tabela hash, garantindo um bom tempo de acesso e minimizando colisões, enquanto mantêm a implementação simples e eficiente.
 
 Durante a implementação do código, alguns problemas foram identificados, porém solucionados em seguida, sendo eles:
 

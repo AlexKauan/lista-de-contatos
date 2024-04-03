@@ -22,7 +22,7 @@ Programa escrito em linguagem C que armazena uma lista telefônica  extraida de 
 ### Interface Gráfica
 A interface gráfica escolhida para estre projeto foi por meio de arquivos, o resultado da hash pode ser visto pelo arquivo  ou pelo gdb.
 ### Configuração da Tablea Hash
-A tabela hash foi implementada utilizando uma estrutura de dados de dispersão que mapeia chaves para valores. O tamanho da tabela (TABLE_SIZE) foi definido como 10000, para manter um equilíbrio entre eficiência de espaço e tempo de acesso, considerando-se o número de contatos esperados. Essas escolhas visam otimizar o desempenho da tabela hash, garantindo um bom tempo de acesso e minimizando colisões, enquanto mantêm a implementação simples e eficiente.
+A tabela hash foi implementada utilizando uma estrutura de dados de dispersão que mapeia chaves para valores. O tamanho da tabela (TABLE_SIZE) foi definido como 40000, para manter um equilíbrio entre eficiência de espaço e tempo de acesso, considerando-se o número de contatos esperados. Essas escolhas visam otimizar o desempenho da tabela hash, garantindo um bom tempo de acesso e minimizando colisões, enquanto mantêm a implementação simples e eficiente.
 
 Durante a implementação do código, alguns problemas foram identificados, porém solucionados em seguida, sendo eles:
 
@@ -34,34 +34,37 @@ Durante a implementação do código, alguns problemas foram identificados, por�
   
 - *Implementação do Método da Multiplicação*: Multiplicamoa a chave por uma constante e depois extraimos a parte fracinária.
 ```c
-  int hash(int chave) {
-    // Método de multiplicação
-    return (int)((chave * 0.6180339887) * TABLE_SIZE) % TABLE_SIZE;
+ double hash(int chave)
+{
+    return (chave * 0.2) / TABLE_SIZE;
 }
 ```
 
 - *Implementação da Sondagem Linear*: Quando ocorre uma colisão, uma nova posição é buscada incrementando até encontrar uma posição que esteja vazia.
 ```c
-void inserir(EntradaTabelaHash tabela[], int chave, Contato contato) {
-    int posicao = hash(chave);
-    int inicial = posicao;
-    int inserido = 0;
+void inserirContato(tabelaHash tabela, struct contato *contato)
+{
+    int chave = concatenacao(contato->nome);
+    int posicao = hash(chave) * TABLE_SIZE;
 
-    do {
-        if (!tabela[posicao].ocupado || tabela[posicao].removido) {
-            tabela[posicao].chave = chave;
-            tabela[posicao].contato = contato;
-            tabela[posicao].ocupado = 1;
-            tabela[posicao].removido = 0;
-            inserido = 1;
-            printf("Contato inserido com sucesso na posição %d\n", posicao);
-        } else {
-            posicao = (posicao + 1) % TABLE_SIZE;
+    // Aloca memória para o novo elemento da lista encadeada
+    struct lista *novoContato = (struct lista *)malloc(sizeof(struct lista));
+    novoContato->contato = contato;
+    novoContato->prox = NULL;
+
+     // Verifica se a posição na tabela é NULL, se for, então um contato pode ser inserido
+    if (tabela[posicao] == NULL)
+    {
+        tabela[posicao] = novoContato;
+    }
+    else //Ele procura uma posição para colocar sempre procurando o próximo indice na tabela
+    {
+        struct lista *atual = tabela[posicao];
+        while (atual->prox != NULL)
+        {
+            atual = atual->prox;
         }
-    } while (!inserido && posicao != inicial);
-
-    if (!inserido) {
-        printf("Não foi possível inserir o contato. Tabela cheia.\n");
+        atual->prox = novoContato;
     }
 }
 

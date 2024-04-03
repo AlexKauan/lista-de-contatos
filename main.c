@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define TABLE_SIZE 40000
-
+//struct que contem as informações dos contatos
 struct contato
 {
     char *nome;
@@ -16,7 +16,8 @@ struct lista
     struct contato *contato;
     struct lista *prox;
 };
-
+//Função que cria um contato, com nome, telefone e e-mail. 
+//Ele aloca dinamicamente o contato e caso a alocação seja bem sucedida ele copia os dados do contato criando uma cópia com a função strdup e retorna o novo contato
 struct contato *criaContato(char *nome, char *tel, char *email)
 {
     struct contato *novo = (struct contato *)malloc(sizeof(struct contato));
@@ -31,46 +32,53 @@ struct contato *criaContato(char *nome, char *tel, char *email)
     return novo;
 }
 
+//Função que calcula o valor da chave de um contato com base no seu nome.
 int concatenacao(char c[])
 {
     int chave = 0, i = 0;
-    while (c[i] != '\0')
+    while (c[i] != '\0') // percorre toda a string e soma o valor de cada caractere para calcular a chave.
     {
         chave += c[i];
         i++;
     }
-    return chave % TABLE_SIZE;
+    return chave % TABLE_SIZE; //Após a soma ela retorna o módulo da divisão da chave pelo tamanho  da tabela que foi definida
 }
 
+// Definição do tipo de dados para a tabela hash
 typedef struct lista *tabelaHash[TABLE_SIZE];
 
+//Função para inicializar a tabela hash
 void inicializarTabela(tabelaHash tabela)
 {
-    for (int i = 0; i < TABLE_SIZE; i++)
+    for (int i = 0; i < TABLE_SIZE; i++)// O loop percorre a tabela até o tamanho da tabela menos 1
     {
-        tabela[i] = NULL;
+        tabela[i] = NULL;//para cada índice da tabela é colocado NULL
     }
 }
 
+//Função que calcula a posição que a chave será colocada
 double hash(int chave)
 {
-    return (chave * 0.2) / TABLE_SIZE;
+    return (chave * 0.2) / TABLE_SIZE;//Multiplica a chave calculada na função "concatenacao" por 0.2 e depois divide pelo tamanho da tabela
 }
 
+//Função para inserir um contato na tabela hash
 void inserirContato(tabelaHash tabela, struct contato *contato)
 {
     int chave = concatenacao(contato->nome);
     int posicao = hash(chave) * TABLE_SIZE;
 
+    // Aloca memória para o novo elemento da lista encadeada
     struct lista *novoContato = (struct lista *)malloc(sizeof(struct lista));
     novoContato->contato = contato;
     novoContato->prox = NULL;
 
+     // Verifica se a posição na tabela é NULL, se for, então um contato pode ser inserido
     if (tabela[posicao] == NULL)
     {
         tabela[posicao] = novoContato;
     }
-    else
+    else //Ele procura uma posição para colocar sempre procurando o próximo indice na tabela
     {
         struct lista *atual = tabela[posicao];
         while (atual->prox != NULL)
@@ -81,17 +89,19 @@ void inserirContato(tabelaHash tabela, struct contato *contato)
     }
 }
 
+//Função para buscar um contato na tabela 
 struct contato *buscarContato(tabelaHash tabela, char *nome)
 {
     int chave = concatenacao(nome);
     int posicao = hash(chave) * TABLE_SIZE;
 
+    //Percorre a lista encadeda com base na posição que foi calculada
     struct lista *atual = tabela[posicao];
     while (atual != NULL)
     {
-        if (strcmp(atual->contato->nome, nome) == 0)
+        if (strcmp(atual->contato->nome, nome) == 0) //compara os nomes da lista com o que está sendo procurado
         {
-            return atual->contato;
+            return atual->contato; //Retorna o contato caso ele tenha sido encontrado
         }
         atual = atual->prox;
     }
@@ -106,10 +116,11 @@ void removerContato(tabelaHash tabela, char *nome)
 
     struct lista *atual = tabela[posicao];
     struct lista *anterior = NULL;
-
+    //Percorre a lista com base na posição que foi calculada
     while (atual != NULL)
     {
-        if (strcmp(atual->contato->nome, nome) == 0)
+       // Compara os nomes da lista com o que está sendo procurado e, se for igual, pega o ponteiro que apontava para ele e coloca para apontar para o próximo
+        if (strcmp(atual->contato->nome, nome) == 0) 
         {
             if (anterior == NULL)
             {
@@ -120,6 +131,7 @@ void removerContato(tabelaHash tabela, char *nome)
                 anterior->prox = atual->prox;
             }
 
+            // Libera a memória alocada
             free(atual->contato->nome);
             free(atual->contato->tel);
             free(atual->contato->email);
@@ -136,7 +148,7 @@ void removerContato(tabelaHash tabela, char *nome)
 
 void adicionarContatosArquivo(tabelaHash tabela, char *nomeArquivo)
 {
-    FILE *arquivo = fopen(nomeArquivo, "r");
+    FILE *arquivo = fopen(nomeArquivo, "r"); //Abre um arquivo no mode de leitura
     if (arquivo == NULL)
     {
         printf("Erro ao abrir o arquivo.\n");
@@ -145,7 +157,7 @@ void adicionarContatosArquivo(tabelaHash tabela, char *nomeArquivo)
 
     char nome[100], tel[20], email[100];
 
-    while (fscanf(arquivo, "Nome: %[^\n]\nTelefone: %[^\n]\nEmail: %[^\n]\n\n", nome, tel, email) == 3)
+    while (fscanf(arquivo, "Nome: %[^\n]\nTelefone: %[^\n]\nEmail: %[^\n]\n\n", nome, tel, email) == 3) // le o arquivo até três campos do arquivo(nome, telefone e e-amil)
     {
         // Remover o '-' do telefone
         for (char *c = tel; *c != '\0'; c++)
@@ -167,7 +179,7 @@ void adicionarContatosArquivo(tabelaHash tabela, char *nomeArquivo)
 
 void listarContatos(tabelaHash tabela)
 {
-    for (int i = 0; i < TABLE_SIZE; i++)
+    for (int i = 0; i < TABLE_SIZE; i++) //Loop percorre a tabela até o tamanho da tabela menos 1
     {
         struct lista *atual = tabela[i];
         while (atual != NULL)
@@ -178,6 +190,7 @@ void listarContatos(tabelaHash tabela)
     }
 }
 
+//Função para limpar a memória que foi alocada
 void limparTabela(tabelaHash tabela)
 {
     for (int i = 0; i < TABLE_SIZE; i++)
@@ -199,10 +212,10 @@ void limparTabela(tabelaHash tabela)
 
 int main()
 {
-    tabelaHash tabela;
-    inicializarTabela(tabela);
+    tabelaHash tabela; //Variável para a tabela hash
+    inicializarTabela(tabela);//Chamada da função para inicializar a tabela hash
 
-    adicionarContatosArquivo(tabela, "todosOsContatos.txt");
+    adicionarContatosArquivo(tabela, "todosOsContatos.txt"); //Chamada da função para adicionar os contatos no arquivo
 
     int opcao;
     char nome[100], tel[20], email[100];
@@ -260,7 +273,7 @@ int main()
 
     } while (opcao != 5);
 
-    limparTabela(tabela);
+    limparTabela(tabela); //Chamada da função para limpar a memória que foi alocada
 
     return 0;
 }

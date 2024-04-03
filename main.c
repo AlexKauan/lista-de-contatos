@@ -4,27 +4,28 @@
 
 #define TABLE_SIZE 10000
 
-typedef struct
+typedef struct Contato
 {
     char nome[50];
     char telefone[15];
     char email[50];
+    int ocupado;
+    int removido;
 } Contato;
 
-typedef struct
+/* typedef struct
 {
     int chave;
     Contato contato;
-    int ocupado;
-    int removido;
-} EntradaTabela;
+} EntradaTabela; */
 
-void inicializarTabela(EntradaTabela tabela[])
+typedef struct Contato *tabelaHash[TABLE_SIZE];
+
+void inicializarTabela(tabelaHash tabela)
 {
     for (int i = 0; i < TABLE_SIZE; i++)
     {
-        tabela[i].ocupado = 0;
-        tabela[i].removido = 0;
+        tabela[i] = NULL;
     }
 }
 
@@ -33,7 +34,7 @@ int hash(int chave)
     return (int)(chave * 0.6180339887) * TABLE_SIZE % TABLE_SIZE;
 }
 
-void inserir(EntradaTabela tabela[], int chave, Contato contato)
+void inserir(tabelaHash tabela, int chave, Contato contato)
 {
     int posicao = hash(chave);
     int inicial = posicao;
@@ -41,12 +42,12 @@ void inserir(EntradaTabela tabela[], int chave, Contato contato)
 
     do
     {
-        if (!tabela[posicao].ocupado || tabela[posicao].removido)
+        if (tabela[posicao]->nome)
         {
-            tabela[posicao].chave = chave;
-            tabela[posicao].contato = contato;
-            tabela[posicao].ocupado = 1;
-            tabela[posicao].removido = 0;
+            tabela[posicao]->nome;
+
+            tabela[posicao]->ocupado = 1;
+            tabela[posicao]->removido = 0;
             inserido = 1;
             printf("Contato inserido com sucesso na posição %d\n", posicao);
         }
@@ -62,20 +63,20 @@ void inserir(EntradaTabela tabela[], int chave, Contato contato)
     }
 }
 
-int buscar(EntradaTabela tabela[], int chave, Contato *contato)
+int buscar(tabelaHash tabela, int chave, Contato *contato)
 {
     int posicao = hash(chave);
     int inicial = posicao;
 
     do
     {
-        if (tabela[posicao].ocupado && !tabela[posicao].removido && tabela[posicao].chave == chave)
+        if (tabela[posicao]->ocupado && !tabela[posicao]->removido)
         {
-            *contato = tabela[posicao].contato;
+            contato = tabela[posicao];
             printf("Contato encontrado na posição %d\n", posicao);
             return 1;
         }
-        else if (!tabela[posicao].ocupado)
+        else if (!tabela[posicao]->ocupado)
         {
             printf("Contato não encontrado\n");
             return 0;
@@ -90,20 +91,20 @@ int buscar(EntradaTabela tabela[], int chave, Contato *contato)
     return 0;
 }
 
-int remover(EntradaTabela tabela[], int chave)
+int remover(tabelaHash tabela, int chave)
 {
     int posicao = hash(chave);
     int inicial = posicao;
 
     do
     {
-        if (tabela[posicao].ocupado && !tabela[posicao].removido && tabela[posicao].chave == chave)
+        if (tabela[posicao]->ocupado && !tabela[posicao]->removido)
         {
-            tabela[posicao].removido = 1;
+            tabela[posicao]->removido = 1;
             printf("Contato removido com sucesso da posição %d\n", posicao);
             return 1;
         }
-        else if (!tabela[posicao].ocupado)
+        else if (!tabela[posicao]->ocupado)
         {
             printf("Contato não encontrado\n");
             return 0;
@@ -120,8 +121,9 @@ int remover(EntradaTabela tabela[], int chave)
 
 int main()
 {
-    EntradaTabela tabela[TABLE_SIZE];
+    tabelaHash tabela;
     inicializarTabela(tabela);
+     char nome[50], telefone[15], email[50];
 
     FILE *arquivo = fopen("todosOsContatos.txt", "r");
     if (arquivo == NULL)
@@ -130,14 +132,18 @@ int main()
         return 1;
     }
 
+    fscanf(arquivo,"Nome: %s\n Telefone: %s\n Email: %s\n",nome, telefone,email);
     char linha[100];
     while (fgets(linha, sizeof(linha), arquivo) != NULL)
     {
         int chave;
-        char nome[50], telefone[15], email[50];
+       
+
+
         sscanf(linha, "%d %s %s %s", &chave, nome, telefone, email);
         Contato contato;
         strcpy(contato.nome, nome);
+        printf("%s\n",nome);
         strcpy(contato.telefone, telefone);
         strcpy(contato.email, email);
         inserir(tabela, chave, contato);
